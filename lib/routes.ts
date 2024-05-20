@@ -1,4 +1,9 @@
-import { RocketIcon, BriefcaseBusinessIcon, TextQuoteIcon,  HomeIcon} from "lucide-react";
+import {
+  RocketIcon,
+  BriefcaseBusinessIcon,
+  HomeIcon,
+  TextIcon,
+} from "lucide-react";
 
 export const adminRoutes = [
   {
@@ -18,7 +23,7 @@ export const adminRoutes = [
   },
   {
     name: "Blog",
-    icon: "TextQuoteIcon",
+    icon: TextIcon,
     href: "/admin/blog",
   },
 ];

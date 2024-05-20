@@ -20,7 +20,11 @@ export default function NavLink({
   children?: ReactNode;
 }) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isActive =
+    pathname === href ||
+    (href.split("/")[href.split("/").length - 1] ===
+      pathname.split("/")[pathname.split("/").length - 2] &&
+      href !== "/admin");
 
   return (
     <Link
