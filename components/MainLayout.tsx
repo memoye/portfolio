@@ -48,7 +48,7 @@ export default async function MainLayout({
       <SideNavigation />
       <div className="flex-1">
         <header className="p-5">
-          <div className="container flex justify-between">
+          <div className="container flex items-center justify-between">
             <div>Page title</div>
             <div className="flex items-center gap-4">
               <DropdownMenu>
@@ -81,7 +81,7 @@ export default async function MainLayout({
 
               <DropdownMenu>
                 <DropdownMenuTrigger className="rounded-full outline-offset-4 outline-ring">
-                  <Avatar className="bg-accent text-accent-foreground outline">
+                  <Avatar className="bg-accent text-accent-foreground outline outline-1 outline-ring drop-shadow-md hover:drop-shadow-none">
                     <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback className="font-extrabold uppercase">
                       {user?.email?.charAt(0)}
