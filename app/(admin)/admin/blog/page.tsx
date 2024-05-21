@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import BlogPosts from "./_components/BlogPosts";
-import Pagination from "@/app/_components/pagination";
+import { BlogPostCardSkeletons } from "@/components/ui/skeletons";
+import { createClient } from "@/utils/supabase/server";
 
 export type PageProps = {
   params: { [key: string]: string | string[] | undefined };
@@ -8,11 +9,13 @@ export type PageProps = {
 };
 
 export default async function BlogPage(props: PageProps) {
+  const { page = 1 } = props.searchParams ?? {};
+
   return (
     <>
       <h2>Blog Page</h2>
-      <Suspense fallback={<div>Loading...</div>}>
-        <BlogPosts />
+      <Suspense fallback={<BlogPostCardSkeletons />}>
+        <BlogPosts page={Number(page)} />
       </Suspense>
     </>
   );

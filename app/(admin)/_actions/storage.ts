@@ -17,7 +17,7 @@ export async function uploadCoverImage(formData: FormData) {
   const supabase = createClient();
   const result = uploadSchema.safeParse(Object.fromEntries(formData.entries()));
 
-  if (result.success === false) {
+  if (result.success == false) {
     console.log("Error validating input");
     return result.error.formErrors.fieldErrors;
   }

@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 export async function GET(_request: Request) {
   const supabase = createClient();
 
-  const response = await supabase.from("blogs").select().limit(20);
+  const response = await supabase.from("blog_posts").select().limit(20);
 
   if (response.error) {
     return Response.json(response.error, {
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   const data = await request.json();
 
   const response = await supabase
-    .from("blogs")
+    .from("blog_posts")
     .insert({
       title: data.title,
       cover_image: data.cover_image,

@@ -19,19 +19,22 @@ import { useSearchParams } from "next/navigation";
 
 type PaginationProps = {
   page?: number;
-  totalPages: number;
+  totalPages?: number;
   href?: `/${string}`;
 };
 
 const MAX_LINKS_TO_SHOW = 3;
 
+// TODO: Refactor later
 function Pagination(props: PaginationProps) {
-  const { page = 1, href = "/", totalPages = 0 } = props;
+  const { page = 1, href = "/", totalPages = 1 } = props;
+
   const searchParams = useSearchParams();
 
   const [showFurtherLinks, setShowFurtherLinks] = useState(false);
 
   const paginationLinks = Array.from({ length: totalPages }, (_x, i) => i + 1);
+
   const sections = divideIntoSections(paginationLinks, MAX_LINKS_TO_SHOW);
   const currentSection = sections.filter((section) =>
     section.includes(page)
@@ -56,6 +59,8 @@ function Pagination(props: PaginationProps) {
     return `${href}?${params.toString()}`;
   }
 
+  if (totalPages < 2) return null;
+
   if (totalPages < 2)
     return (
       <Separator className="bg-gradient mx-auto my-4 w-10 from-transparent via-secondary to-transparent" />
@@ -64,15 +69,17 @@ function Pagination(props: PaginationProps) {
   return (
     <PaginationContainer className="my-4">
       <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious
-            href={hasPrevPage ? getPageURL(page - 1) : "#"}
-            aria-disabled={!hasPrevPage}
-            className={cn({
-              "opacity-40 hover:bg-background": !hasPrevPage,
-            })}
-          />
-        </PaginationItem>
+        {hasPrevPage && (
+          <PaginationItem>
+            <PaginationPrevious
+              href={getPageURL(page - 1)}
+              aria-disabled={!hasPrevPage}
+              className={cn({
+                "opacity-40 hover:bg-background": !hasPrevPage,
+              })}
+            />
+          </PaginationItem>
+        )}
 
         {!isFirstSection && (
           <>
@@ -82,6 +89,7 @@ function Pagination(props: PaginationProps) {
             <Separator orientation="vertical" />
           </>
         )}
+
         {currentSection?.map((link) => (
           <PaginationItem key={link}>
             <PaginationLink
@@ -94,7 +102,8 @@ function Pagination(props: PaginationProps) {
             </PaginationLink>
           </PaginationItem>
         ))}
-        {sections.length > 1 && !isLastSection && (
+
+        {sections.length > 1 && !isLastSection && canSafelyShowFurtherLinks && (
           <>
             <PaginationItem>
               <Button
@@ -139,15 +148,16 @@ function Pagination(props: PaginationProps) {
               ))}
           </>
         )}
-
-        <PaginationItem>
-          <PaginationNext
-            href={hasNextPage ? getPageURL(page + 1) : "#"}
-            className={cn({
-              "opacity-40 hover:bg-background": !hasNextPage,
-            })}
-          />
-        </PaginationItem>
+        {hasNextPage && (
+          <PaginationItem>
+            <PaginationNext
+              href={getPageURL(page + 1)}
+              className={cn("border-secondary", {
+                "opacity-40 hover:bg-background": !hasNextPage,
+              })}
+            />
+          </PaginationItem>
+        )}
       </PaginationContent>
     </PaginationContainer>
   );
