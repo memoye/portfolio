@@ -63,7 +63,7 @@ export default function BlogForm() {
 
   return (
     <>
-      {!isLoading && (
+      {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <LucideLoader2 className="size-28 animate-spin text-gray-500" />
         </div>
