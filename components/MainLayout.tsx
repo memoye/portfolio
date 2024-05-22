@@ -25,11 +25,9 @@ export default async function MainLayout({
 }) {
   const supabase = createClient();
 
-  // const {
-  //   data: { user },
-  // } = await supabase.auth.getUser();
-
-  const user = { email: "test@demo.com" }; // offline testing
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const signOut = async () => {
     "use server";
