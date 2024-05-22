@@ -25,11 +25,11 @@ export default async function MainLayout({
 }) {
   const supabase = createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // const {
+  //   data: { user },
+  // } = await supabase.auth.getUser();
 
-  // const user = { email: "test@demo.com" }; // offline testing
+  const user = { email: "test@demo.com" }; // offline testing
 
   const signOut = async () => {
     "use server";
@@ -103,7 +103,7 @@ export default async function MainLayout({
                     👋
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>
                     <LogOutIcon /> Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>

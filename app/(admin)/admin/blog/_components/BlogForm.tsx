@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LucideLoader2, SaveIcon, XIcon, XSquareIcon } from "lucide-react";
@@ -10,8 +10,15 @@ import ImageUpload from "./ImageUpload";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import ConfirmationDialog from "@/app/_components/confirmation-dialog";
+import { cn } from "@/lib/utils";
 
 const MAX_TAGS = 8;
+
+type EditorContent = {
+  type: string;
+  content: {}[];
+};
 
 export default function BlogForm() {
   const router = useRouter();
@@ -25,7 +32,9 @@ export default function BlogForm() {
   const [blogDescription, setBlogDescription] = useState("");
   const [imageAttribution, setImageAttribution] = useState("");
   const [published, setPublished] = useState(false);
-  const [blogContent, setBlogContent] = useState({});
+  const [blogContent, setBlogContent] = useState<
+    string | EditorContent | undefined
+  >(undefined);
   const [blogTags, setBlogTags] = useState<string[]>([""]);
 
   const updateContent = useCallback((data: any) => {
@@ -134,11 +143,13 @@ export default function BlogForm() {
           disableLocalStorage
         />
       </div>
+
+      {/* TODO: Extract this to a reusable <TagInput /> component */}
       <div className="mt-5 space-y-2">
-        <Label htmlFor="content" className="text-xl">
+        <Label htmlFor="blogTags" className="text-xl">
           Tags
         </Label>
-        <div className="flex flex-col gap-2 rounded border px-4 py-2 outline-blue-500 focus-within:outline">
+        <div className="flex flex-col gap-2 rounded border px-4 py-2 outline-offset-2 outline-blue-500 focus-within:outline">
           <textarea
             value={tagInputValue}
             name="blogTags"
@@ -169,7 +180,6 @@ export default function BlogForm() {
             className="bg-red flex-auto resize-none border-none p-2 outline-none focus:outline-none"
           />
 
-          {/* TODO: Extract this to a reusable <TagInput /> component */}
           <div className="flex min-w-[200px] flex-wrap gap-1">
             {blogTags?.map((tag, i) => {
               if (tag === "") {
@@ -202,10 +212,12 @@ export default function BlogForm() {
 
       <div className="mt-5 flex items-center justify-between space-y-2 rounded border border-border p-4 ">
         <div className="">
-          <Label htmlFor="published" className="text-xl">
+          <Label htmlFor="published" className="flex flex-col text-xl">
             Publish
+            <span className="text-base text-gray-500">
+              Make visible on save
+            </span>
           </Label>
-          <p className="text-gray-500">Make visible on save</p>
         </div>
         <Switch
           id="published"
@@ -215,11 +227,21 @@ export default function BlogForm() {
         />
       </div>
 
-      <div className="mt-5 space-x-3 ">
-        <Button variant={"destructive"} className="space-x-2 bg-opacity-50">
-          <XSquareIcon size={16} />
-          <span>Cancel</span>
-        </Button>
+      <div className="mt-5 flex items-center space-x-2">
+        {blogTitle || blogContent || uploadedImageURL ? (
+          <ConfirmationDialog
+            onConfirm={() => router.back()}
+            description="Your changes will be discarded."
+          >
+            <span className={cn(buttonVariants({ variant: "outline" }))}>
+              Cancel
+            </span>
+          </ConfirmationDialog>
+        ) : (
+          <Button variant={"outline"} onClick={() => router.back()}>
+            Cancel
+          </Button>
+        )}
         <Button
           className="space-x-2"
           onClick={saveBlog}
