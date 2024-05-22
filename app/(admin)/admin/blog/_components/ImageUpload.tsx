@@ -136,7 +136,7 @@ function ImageUpload({
 
   return (
     <>
-      <p className="flex items-center justify-between text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+      <p className="flex items-center justify-between text-xl font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
         <span>Cover Image</span>
         {
           {

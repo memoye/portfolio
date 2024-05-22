@@ -3,11 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LucideLoader2, SaveIcon, XSquareIcon } from "lucide-react";
+import { LucideLoader2, SaveIcon, XIcon, XSquareIcon } from "lucide-react";
 import { Editor } from "novel";
 import { useCallback, useState } from "react";
 import ImageUpload from "./ImageUpload";
 import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+
+const MAX_TAGS = 8;
 
 export default function BlogForm() {
   const router = useRouter();
@@ -15,9 +19,14 @@ export default function BlogForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<string[] | null>(null);
   const [uploadedImageURL, setUploadedImageURL] = useState<string | null>(null);
+  const [tagInputValue, setTagInputValue] = useState("");
 
   const [blogTitle, setBlogTitle] = useState("");
+  const [blogDescription, setBlogDescription] = useState("");
+  const [imageAttribution, setImageAttribution] = useState("");
+  const [published, setPublished] = useState(false);
   const [blogContent, setBlogContent] = useState({});
+  const [blogTags, setBlogTags] = useState<string[]>([""]);
 
   const updateContent = useCallback((data: any) => {
     setBlogContent(data.getJSON());
@@ -35,7 +44,11 @@ export default function BlogForm() {
       body: JSON.stringify({
         title: blogTitle,
         cover_image: uploadedImageURL,
+        cover_image_attribution: imageAttribution,
+        tags: blogTags,
         content: blogContent,
+        description: blogDescription,
+        published: published,
       }),
     });
 
@@ -50,19 +63,38 @@ export default function BlogForm() {
 
   return (
     <>
-      {isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/30">
+      {!isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <LucideLoader2 className="size-28 animate-spin text-gray-500" />
         </div>
       )}
+
       <div className="space-y-2">
-        <Label htmlFor="blogTitle">Title</Label>
+        <Label htmlFor="blogTitle" className="text-xl">
+          Title
+        </Label>
         <Input
           name="blogTitle"
           id="blogTitle"
+          className="placeholder:italic"
+          placeholder="Choose a title for your blog post"
           value={blogTitle}
           onChange={(e) => setBlogTitle(e.target.value)}
           required
+        />
+      </div>
+
+      <div className="mt-5 space-y-2">
+        <Label htmlFor="blogDescription" className="text-xl">
+          Description
+        </Label>
+        <Textarea
+          name="blogDescription"
+          className="placeholder:italic"
+          id="blogDescription"
+          value={blogDescription}
+          onChange={(e) => setBlogDescription(e.target.value)}
+          placeholder="Enter a short description for this blog post"
         />
       </div>
 
@@ -76,17 +108,113 @@ export default function BlogForm() {
           title={blogTitle}
         />
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="imageAttribution" className="text-xl">
+          Image attribution (optional)
+        </Label>
+        <Input
+          name="imageAttribution"
+          id="imageAttribution"
+          className="placeholder:italic"
+          placeholder="Enter link or name of creator/source"
+          value={imageAttribution}
+          onChange={(e) => setImageAttribution(e.target.value)}
+        />
+      </div>
 
       <div className="mt-5 space-y-2">
-        <Label htmlFor="content">Content</Label>
+        <Label htmlFor="content" className="text-xl">
+          Content
+        </Label>
         <Editor
           editorProps={{}}
           defaultValue={""}
           onDebouncedUpdate={updateContent}
-          className="rounded border bg-card pb-8"
+          className="z-0 rounded border bg-card pb-8"
           disableLocalStorage
         />
       </div>
+      <div className="mt-5 space-y-2">
+        <Label htmlFor="content" className="text-xl">
+          Tags
+        </Label>
+        <div className="flex flex-col gap-2 rounded border px-4 py-2 outline-blue-500 focus-within:outline">
+          <textarea
+            value={tagInputValue}
+            name="blogTags"
+            id="blogTags"
+            onChange={(e) => {
+              setTagInputValue(e.target.value);
+              setBlogTags(
+                e.target.value
+                  .trim()
+                  .split(", ")
+                  .map((t) => t.trim().replace(",", ""))
+              );
+              if (e.target.value.split(",").length > MAX_TAGS) {
+                e.target.value = e.target.value
+                  .split(",")
+                  .slice(0, MAX_TAGS)
+                  .join(",");
+                setBlogTags(
+                  e.target.value
+                    .split(", ")
+                    .map((t) => t.trim().replace(",", ""))
+                );
+              }
+            }}
+            placeholder={`Enter up to ${
+              MAX_TAGS - (blogTags?.length ?? 0)
+            } comma-separated words/phrases`}
+            className="bg-red flex-auto resize-none border-none p-2 outline-none focus:outline-none"
+          />
+
+          {/* TODO: Extract this to a reusable <TagInput /> component */}
+          <div className="flex min-w-[200px] flex-wrap gap-1">
+            {blogTags?.map((tag, i) => {
+              if (tag === "") {
+                return null;
+              } else {
+                return (
+                  <p
+                    key={tag + i}
+                    className="flex w-fit items-center rounded-sm bg-secondary p-1 px-2 text-foreground/70"
+                  >
+                    <span>{tag}</span>
+                    <button
+                      className="flex items-center gap-2 rounded-full p-0.5 hover:bg-destructive/10"
+                      onClick={() => {
+                        const newTags = blogTags.filter((t) => t !== tag);
+                        setBlogTags(newTags);
+                        setTagInputValue(newTags.join(", "));
+                      }}
+                    >
+                      <XIcon size={12} />
+                      <span className="sr-only">remove {tag} from tags</span>
+                    </button>
+                  </p>
+                );
+              }
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-5 flex items-center justify-between space-y-2 rounded border border-border p-4 ">
+        <div className="">
+          <Label htmlFor="published" className="text-xl">
+            Publish
+          </Label>
+          <p className="text-gray-500">Make visible on save</p>
+        </div>
+        <Switch
+          id="published"
+          name="published"
+          checked={published}
+          onCheckedChange={() => setPublished((prev) => !prev)}
+        />
+      </div>
+
       <div className="mt-5 space-x-3 ">
         <Button variant={"destructive"} className="space-x-2 bg-opacity-50">
           <XSquareIcon size={16} />

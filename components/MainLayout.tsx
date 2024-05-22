@@ -64,7 +64,7 @@ export default async function MainLayout({
                         key={href}
                         className="flex items-center justify-between p-2 font-medium"
                       >
-                        <Link href={`${href}/new`}>
+                        <Link href={`${href}/new`} scroll={false}>
                           <span>
                             {name.charAt(name.length - 1) === "s"
                               ? name.slice(0, -1)

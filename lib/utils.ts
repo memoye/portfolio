@@ -12,3 +12,10 @@ export function divideIntoSections(arr: Array<any>, sectionSize = 5) {
   }
   return sections;
 }
+
+export const isBrowser = () => typeof window !== "undefined";
+
+export function scrollToTop() {
+  if (!isBrowser()) return;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}

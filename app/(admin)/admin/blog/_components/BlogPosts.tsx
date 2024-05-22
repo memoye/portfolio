@@ -8,7 +8,7 @@ type BlogPostCount = {
   count: number | null;
 };
 
-const PAGE_RANGE = 5;
+const PAGE_RANGE = 6;
 
 const fetchBlogPosts = async (
   offset: number,

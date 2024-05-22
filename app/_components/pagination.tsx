@@ -104,7 +104,7 @@ function Pagination(props: PaginationProps) {
         ))}
 
         {sections.length > 1 && !isLastSection && canSafelyShowFurtherLinks && (
-          <>
+ 
             <PaginationItem>
               <Button
                 variant="ghost"
@@ -127,7 +127,7 @@ function Pagination(props: PaginationProps) {
                 )}
               </Button>
             </PaginationItem>
-          </>
+       
         )}
 
         {showFurtherLinks && canSafelyShowFurtherLinks && (

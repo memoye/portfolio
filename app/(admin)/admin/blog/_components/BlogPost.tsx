@@ -27,12 +27,18 @@ export default function BlogPost(props: BlogPostProps) {
     created_at,
     published,
     content,
+    hits,
+    cover_image_attribution,
+    tags,
     description,
   } = props;
 
   return (
-    <Card className="group relative cursor-default overflow-hidden rounded-lg border-border bg-transparent p-4">
-      <figure className="relative mx-auto aspect-video h-auto w-full overflow-hidden rounded p-4 drop-shadow-lg group-hover:drop-shadow-none">
+    <Card
+      className="_p-4 _border-border
+     group relative flex min-h-[200px] cursor-default flex-col justify-between overflow-hidden rounded-lg border-none bg-transparent transition-shadow hover:shadow-md"
+    >
+      {/* <figure className="relative mx-auto aspect-video h-auto w-full overflow-hidden rounded p-4 drop-shadow-lg group-hover:drop-shadow-none">
         <Image
           src={cover_image || "/images/pexels-enginakyurt-3248292.jpg"}
           className="flex place-items-center object-cover text-center font-mono"
@@ -60,33 +66,34 @@ export default function BlogPost(props: BlogPostProps) {
           )}
         </figcaption>
         <span className="delay-50 absolute inset-0 block bg-gradient-to-b from-transparent to-black opacity-10 transition-opacity duration-300 group-hover:opacity-30" />
-      </figure>
+      </figure> */}
+      <div>
+        {published && (
+          <div className="absolute right-6 top-6 z-50 flex items-center gap-2">
+            <NotepadTextDashedIcon size={26} className="text-foreground" />
+            <span className="sr-only">
+              This article is not yet published. Click on publish to publish it
+            </span>
+          </div>
+        )}
 
-      {!published && (
-        <div className="absolute right-6 top-6 z-50 flex items-center gap-2">
-          <NotepadTextDashedIcon size={26} className="text-white" />
-          <span className="sr-only">
-            This article is not yet published. Click on publish to publish it
-          </span>
-        </div>
-      )}
+        <CardHeader>
+          <CardTitle className="mb-2 line-clamp-2 text-balance leading-7">
+            {title}
+          </CardTitle>
+          <CardDescription className="flex items-center gap-1 font-light">
+            <CalendarIcon className="size-4" />{" "}
+            <span className="sr-only">Created:</span>{" "}
+            {new Date(created_at).toLocaleDateString()}
+          </CardDescription>
+        </CardHeader>
 
-      <CardHeader>
-        <CardTitle className="mb-2 line-clamp-2 text-balance leading-7">
-          {title}
-        </CardTitle>
-        <CardDescription className="flex items-center gap-1 font-light">
-          <CalendarIcon className="size-4" />{" "}
-          <span className="sr-only">Created:</span>{" "}
-          {new Date(created_at).toLocaleDateString()}
-        </CardDescription>
-      </CardHeader>
-
-      {description && (
-        <CardContent>
-          <p className="line-clamp-2 text-balance ">{description}</p>
-        </CardContent>
-      )}
+        {description && (
+          <CardContent>
+            <p className="line-clamp-2 text-balance ">{description}</p>
+          </CardContent>
+        )}
+      </div>
 
       <CardFooter className="flex items-center gap-1">
         <Button

@@ -9,4 +9,5 @@ export type BlogPost = {
   hits: number;
   published: boolean;
   description: string | null;
+  tags: string[] | null;
 };

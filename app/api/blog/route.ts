@@ -25,12 +25,17 @@ export async function POST(request: Request) {
     .from("blog_posts")
     .insert({
       title: data.title,
+      description: data.description,
       cover_image: data.cover_image,
+      cover_image_attribution: data.cover_image_attribution,
+      tags: data.tags,
       content: data.content,
+      published: data.published,
     })
     .select()
     // .limit(1)
     .single();
+  console.log(data);
 
   return Response.json(response);
 }

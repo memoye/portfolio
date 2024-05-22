@@ -7,7 +7,7 @@ type AdminLayoutProps = {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div>
+    <div className="scroll-mt-6 scroll-smooth">
       <MainLayout>{children}</MainLayout>
     </div>
   );
