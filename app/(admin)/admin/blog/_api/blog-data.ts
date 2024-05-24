@@ -1,5 +1,6 @@
 "use server";
 
+import { type BlogPost } from "@/lib/definitions";
 import { createClient } from "@/utils/supabase/server";
 
 type BlogPostCount = {
@@ -31,7 +32,7 @@ export async function fetchBlogPosts(
   query: string,
   currentPage: number,
   order: "asc" | "desc" = "desc",
-  sort_by: string = "created_at"
+  order_by: string = "created_at"
 ) {
   const supabase = createClient();
 
@@ -43,11 +44,29 @@ export async function fetchBlogPosts(
       .from("blog_posts")
       .select("*")
       .or(`title.ilike.%${query}%, description.ilike.%${query}%`)
-      .order(sort_by || "created_at", { ascending: order === "asc" })
+      .order(order_by || "created_at", { ascending: order === "asc" })
       .range(offset - 1, limit);
     return { data, error };
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch total number of Blog posts.");
+  }
+}
+
+export async function fetchBlogPostDetails(id: Pick<BlogPost, "id">) {
+  const supabase = createClient();
+
+  try {
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*")
+      .eq("id", id)
+      .limit(1)
+      .single();
+
+    return { data, error };
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch blog post.");
   }
 }

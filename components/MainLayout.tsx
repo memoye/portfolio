@@ -27,11 +27,11 @@ export default async function MainLayout({
 }) {
   const supabase = createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // const {
+  //   data: { user },
+  // } = await supabase.auth.getUser();
 
-  // const user = { email: "test@demo.com" }; // offline testing
+  const user = { email: "test@demo.com" }; // offline testing
 
   if (!user) {
     return redirect("/login");

@@ -29,7 +29,7 @@ export default function SideNavigation({
                   <NavLink
                     className={{
                       default: cn(
-                        "relative flex items-center gap-2 rounded border border-transparent p-4 font-light text-primary-foreground/80 transition-colors duration-200 ease-in-out hover:border-border",
+                        "relative flex items-center gap-2 rounded border border-transparent p-4 font-light text-foreground/80 transition-colors duration-200 ease-in-out hover:border-border",
                         "max-sm:mx-auto max-sm:max-w-12 max-sm:justify-center max-sm:p-2"
                       ),
                       active: cn(

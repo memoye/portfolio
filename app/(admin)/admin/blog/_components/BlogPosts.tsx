@@ -6,17 +6,25 @@ import NoDataFound from "@/components/ui/no-data";
 export default async function BlogPosts({
   page = 1,
   searchQuery,
-  sort = "desc",
+  orderBy,
 }: {
   page?: number;
   searchQuery?: string;
-  sort?: "asc" | "desc";
+  orderBy?: {
+    by?: "created_at" | "published_at" | "title" | "hits";
+    order?: "asc" | "desc";
+  };
 }) {
-  const { data, error } = await fetchBlogPosts(searchQuery || "", page, sort);
+  const { data, error } = await fetchBlogPosts(
+    searchQuery || "",
+    page,
+    orderBy?.order,
+    orderBy?.by
+  );
 
   if (error) {
     console.log(error);
-    throw new Error(error.message || "Failed to fetch blog posts");
+    // throw new Error(error.message || "Failed to fetch blog posts");
   }
 
   if (!data || data?.length < 1) {

@@ -14,7 +14,7 @@ export default function NoDataFound(props: NoDataFoundProps) {
 
   return (
     <div className="flex justify-center">
-      <div className="flex min-h-[150px] w-full items-center justify-center rounded-xl border border-dashed border-foreground bg-muted/5 px-4 py-12">
+      <div className="flex min-h-[130px] w-full items-center justify-center rounded-xl border border-dashed border-foreground bg-muted/5 px-4 py-12">
         {/* LOGO COLOR HEX: #b04404*/}
         <div className="text-center">
           <figure className="mx-auto w-fit">

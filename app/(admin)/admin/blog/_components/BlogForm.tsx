@@ -12,8 +12,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import ConfirmationDialog from "@/app/_components/confirmation-dialog";
 import { cn } from "@/lib/utils";
+import { type BlogPost } from "@/lib/definitions";
 
 const MAX_TAGS = 8;
+
+type BlogFormProps = {
+  defaultValues?: Omit<BlogPost, "content"> & {
+    content?: string | EditorContent;
+  };
+  method?: "POST" | "UPDATE" | "DELETE" | "PATCH";
+};
 
 type EditorContent = {
   type: string;
@@ -114,6 +122,7 @@ export default function BlogForm() {
             setUploadedImageURL(null);
             setErrors(err);
           }}
+          // defaultImage={}
           title={blogTitle}
         />
       </div>
