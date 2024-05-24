@@ -1,72 +1,37 @@
-import { createClient } from "@/utils/supabase/server";
-import { type BlogPost } from "@/lib/definitions";
-import { notFound } from "next/navigation";
-import Pagination from "@/app/_components/pagination";
+import Image from "next/image";
 import BlogPostCard from "./BlogPost";
+import { fetchBlogPosts } from "../_api/blog-data";
+import NoDataFound from "@/components/ui/no-data";
 
-type BlogPostCount = {
-  count: number | null;
-};
-
-const PAGE_RANGE = 6;
-
-const fetchBlogPosts = async (
-  offset: number,
-  limit: number,
-  sort?: string,
-  order?: "asc" | "desc"
-) => {
-  "use server";
-
-  const supabase = createClient();
-
-  // get total number of blog posts
-  const { count: total }: BlogPostCount = (await supabase
-    .from("blog_posts")
-    .select("*", { count: "estimated", head: true })) ?? { count: 0 };
-
-  // fetch paginated data
-  const ascending = order === "asc";
-  const { data, error } = await supabase
-    .from("blog_posts")
-    .select("*")
-    .order(sort || "created_at", { ascending })
-    .range(offset, limit - 1);
+export default async function BlogPosts({
+  page = 1,
+  searchQuery,
+  sort = "desc",
+}: {
+  page?: number;
+  searchQuery?: string;
+  sort?: "asc" | "desc";
+}) {
+  const { data, error } = await fetchBlogPosts(searchQuery || "", page, sort);
 
   if (error) {
-    return notFound();
+    console.log(error);
+    throw new Error(error.message || "Failed to fetch blog posts");
   }
 
-  const result: { data: BlogPost[]; total: number } = {
-    data,
-    total: total ?? 0,
-  };
-  return result;
-};
-
-export default async function BlogPosts({ page = 1 }: { page?: number }) {
-  const from = (page - 1) * PAGE_RANGE;
-  const to = PAGE_RANGE * page;
-
-  const { data, total } = await fetchBlogPosts(from, to);
-
-  if (page > total) {
-    return notFound();
+  if (!data || data?.length < 1) {
+    return (
+      <NoDataFound recoveryURL="/admin/blog" dataItemIdentifier="blog post" />
+    );
   }
 
   return (
     <>
-      <div className="grid grid-cols-[repeat(auto-fill,_minmax(300px,1fr))] content-center gap-8 lg:gap-12">
+      <div className="grid grid-cols-[repeat(auto-fill,_minmax(250px,1fr))] content-center gap-8 lg:gap-12">
         {data?.map((post) => (
           <BlogPostCard key={post.id} {...post} />
         ))}
       </div>
-
-      <Pagination
-        totalPages={Math.ceil(total / PAGE_RANGE)}
-        page={page}
-        href="/admin/blog"
-      />
     </>
   );
 }

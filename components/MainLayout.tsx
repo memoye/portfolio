@@ -2,7 +2,8 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import SideNavigation from "./SideNavigation";
 import { ReactNode } from "react";
-import { LogOutIcon, PlusCircleIcon, PlusIcon } from "lucide-react";
+import { LogOutIcon, PlusIcon } from "lucide-react";
+import SignOut from "./SignOut";
 
 import {
   DropdownMenu,
@@ -14,9 +15,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "./ui/button";
 import { adminRoutes } from "@/lib/routes";
 import Link from "next/link";
+import { buttonVariants } from "./ui/button";
+import { Separator } from "./ui/separator";
 
 export default async function MainLayout({
   children,
@@ -29,13 +31,7 @@ export default async function MainLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const signOut = async () => {
-    "use server";
-
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    return redirect("/login");
-  };
+  // const user = { email: "test@demo.com" }; // offline testing
 
   if (!user) {
     return redirect("/login");
@@ -43,31 +39,35 @@ export default async function MainLayout({
 
   return (
     <div className="flex min-h-screen">
-      <SideNavigation />
+      <SideNavigation userEmail={user.email || ""} />
       <div className="flex-1">
-        <header className="p-5">
-          <div className="container flex items-center justify-between">
-            <div>Page title</div>
+        <header className="sticky top-0 z-40 bg-background/85 px-0 py-5 text-foreground backdrop-blur">
+          <div className="container flex items-center justify-end max-sm:px-4">
+            {/* <div className="font-extrabold">Page title</div> */}
             <div className="flex items-center gap-4">
               <DropdownMenu>
-                <DropdownMenuTrigger className="rounded border p-2 px-4 outline-offset-2 outline-ring hover:border-foreground/50 focus:outline">
-                  <span className="text-foreground">Create</span>
+                <DropdownMenuTrigger
+                  className={buttonVariants({
+                    variant: "outline",
+                    className: "cursor-pointer hover:text-primary",
+                  })}
+                  asChild
+                >
+                  <span className="inline-flex h-10 items-center border border-primary px-4 font-medium text-primary">
+                    Create
+                  </span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="space-y-1" align="end">
                   {adminRoutes
-                    .filter(({ name }) => name !== "Home")
-                    .map(({ name, href }) => (
+                    .filter((r) => !!r.child)
+                    .map((route) => (
                       <DropdownMenuItem
                         asChild
-                        key={href}
-                        className="flex items-center justify-between p-2 font-medium"
+                        key={route.href}
+                        className="flex items-center justify-between gap-4 p-2 font-medium hover:bg-accent"
                       >
-                        <Link href={`${href}/new`} scroll={false}>
-                          <span>
-                            {name.charAt(name.length - 1) === "s"
-                              ? name.slice(0, -1)
-                              : name}
-                          </span>
+                        <Link href={`${route.href}/new`} scroll={false}>
+                          <span>{route.child}</span>
                           <span className="text-foreground/50">
                             <PlusIcon className="size-4" />
                           </span>
@@ -76,16 +76,19 @@ export default async function MainLayout({
                     ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-
+              <div className="h-10">
+                <Separator orientation="vertical" />
+              </div>
               <DropdownMenu>
-                <DropdownMenuTrigger className="rounded-full outline-offset-4 outline-ring">
-                  <Avatar className="bg-accent text-accent-foreground outline outline-1 outline-ring drop-shadow-md hover:drop-shadow-none">
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                <DropdownMenuTrigger className=" outline-offset-4 outline-ring">
+                  <Avatar className="bg-accent text-accent-foreground outline outline-1 outline-ring hover:drop-shadow-md">
+                    <AvatarImage src="https://github.com/memoye.png?size=256" />
                     <AvatarFallback className="font-extrabold uppercase">
-                      {user?.email?.charAt(0)}
+                      {user?.email?.charAt(0) || "BM"}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
+
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>
                     {user.email ? (
@@ -101,35 +104,18 @@ export default async function MainLayout({
                     👋
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut}>
-                    <LogOutIcon /> Log out
+                  <DropdownMenuItem>
+                    <SignOut />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
         </header>
-        <main className="p-4 md:p-6">{children}</main>
+        <main className="relative bg-background p-4 pb-24 md:p-6">
+          {children}
+        </main>
       </div>
     </div>
   );
-
-  // return (
-  //   <div className="flex items-center gap-4">
-  //     Hey, {user.email}!
-  //     <form action={signOut}>
-  //       <button className="rounded-md bg-btn-background px-4 py-2 no-underline hover:bg-btn-background-hover">
-  //         Logout
-  //       </button>
-  //     </form>
-  //   </div>
-  // );
-  // : (
-  //   <Link
-  //     href="/login"
-  //     className="flex rounded-md bg-btn-background px-3 py-2 no-underline hover:bg-btn-background-hover"
-  //   >
-  //     Login
-  //   </Link>
-  // );
 }

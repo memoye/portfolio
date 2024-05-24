@@ -149,8 +149,9 @@ export default function BlogForm() {
         <Label htmlFor="blogTags" className="text-xl">
           Tags
         </Label>
-        <div className="flex flex-col gap-2 rounded border px-4 py-2 outline-offset-2 outline-blue-500 focus-within:outline">
+        <div className="flex flex-col gap-2 rounded border px-4 py-2 outline-offset-2 outline-primary focus-within:outline">
           <textarea
+            className="bg-red flex-auto resize-none border-none bg-transparent p-2 outline-none focus:outline-none"
             value={tagInputValue}
             name="blogTags"
             id="blogTags"
@@ -177,7 +178,6 @@ export default function BlogForm() {
             placeholder={`Enter up to ${
               MAX_TAGS - (blogTags?.length ?? 0)
             } comma-separated words/phrases`}
-            className="bg-red flex-auto resize-none border-none p-2 outline-none focus:outline-none"
           />
 
           <div className="flex min-w-[200px] flex-wrap gap-1">
@@ -227,7 +227,7 @@ export default function BlogForm() {
         />
       </div>
 
-      <div className="mt-5 flex items-center space-x-2">
+      <div className="mt-5 flex items-center justify-end gap-2 max-sm:flex-col-reverse max-sm:items-stretch">
         {blogTitle || blogContent || uploadedImageURL ? (
           <ConfirmationDialog
             onConfirm={() => router.back()}

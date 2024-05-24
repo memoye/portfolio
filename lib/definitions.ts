@@ -11,3 +11,28 @@ export type BlogPost = {
   description: string | null;
   tags: string[] | null;
 };
+
+export type Experience = {
+  id: number;
+  created_at: string;
+  title: string;
+  current: boolean;
+  company: {
+    name: string;
+    logo?: string;
+    location?: string;
+    website?: string;
+  };
+  description: string;
+  start_date: string;
+  end_date: string;
+  skills: Skill[];
+};
+
+export type Skill = {
+  id: number;
+  created_at: string;
+  title: string;
+  description: string;
+  icon?: string;
+};

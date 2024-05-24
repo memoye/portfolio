@@ -1,165 +1,128 @@
 "use client";
 
-import { cn, divideIntoSections } from "@/lib/utils";
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import clsx from "clsx";
+import Link from "next/link";
+import { generatePagination } from "@/lib/utils";
+import { usePathname, useSearchParams } from "next/navigation";
 
-import {
-  Pagination as PaginationContainer,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronsRightLeft } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { useSearchParams } from "next/navigation";
+export default function Pagination({ totalPages }: { totalPages: number }) {
+  // NOTE: comment in this code when you get to this point in the course
 
-type PaginationProps = {
-  page?: number;
-  totalPages?: number;
-  href?: `/${string}`;
-};
-
-const MAX_LINKS_TO_SHOW = 3;
-
-// TODO: Refactor later
-function Pagination(props: PaginationProps) {
-  const { page = 1, href = "/", totalPages = 1 } = props;
-
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get("page")) || 1;
 
-  const [showFurtherLinks, setShowFurtherLinks] = useState(false);
-
-  const paginationLinks = Array.from({ length: totalPages }, (_x, i) => i + 1);
-
-  const sections = divideIntoSections(paginationLinks, MAX_LINKS_TO_SHOW);
-  const currentSection = sections.filter((section) =>
-    section.includes(page)
-  )[0];
-
-  const hasPrevPage = page >= 2;
-  const hasNextPage = page < totalPages;
-  const canSafelyShowFurtherLinks =
-    sections.indexOf(currentSection) < sections.length - 3;
-
-  const isLastSection = sections.indexOf(currentSection) >= sections.length - 1;
-  const isFirstSection = sections.indexOf(currentSection) === 0;
-
-  function getPageURL(page: number) {
+  function createPageURL(pageNumber: number | string) {
     const params = new URLSearchParams(searchParams);
-    if (page < 1 || page > totalPages) {
-      params.delete("page", page.toString());
-      return href;
-    }
-
-    params.set("page", page.toString());
-    return `${href}?${params.toString()}`;
+    params.set("page", pageNumber.toString());
+    return `${pathname}?${params.toString()}`;
   }
 
-  if (totalPages < 2) return null;
-
-  if (totalPages < 2)
-    return (
-      <Separator className="bg-gradient mx-auto my-4 w-10 from-transparent via-secondary to-transparent" />
-    );
+  const allPages = generatePagination(currentPage, totalPages);
 
   return (
-    <PaginationContainer className="my-4">
-      <PaginationContent>
-        {hasPrevPage && (
-          <PaginationItem>
-            <PaginationPrevious
-              href={getPageURL(page - 1)}
-              aria-disabled={!hasPrevPage}
-              className={cn({
-                "opacity-40 hover:bg-background": !hasPrevPage,
-              })}
-            />
-          </PaginationItem>
-        )}
+    <>
+      <div className="inline-flex">
+        <PaginationArrow
+          direction="left"
+          href={createPageURL(currentPage - 1)}
+          isDisabled={currentPage <= 1}
+        />
 
-        {!isFirstSection && (
-          <>
-            <PaginationItem className="font-light">
-              <PaginationLink href={getPageURL(1)}>1</PaginationLink>
-            </PaginationItem>
-            <Separator orientation="vertical" />
-          </>
-        )}
+        <div className="flex -space-x-px">
+          {allPages.map((page, index) => {
+            let position: "first" | "last" | "single" | "middle" | undefined;
 
-        {currentSection?.map((link) => (
-          <PaginationItem key={link}>
-            <PaginationLink
-              href={getPageURL(link)}
-              className={cn({
-                border: page === link,
-              })}
-            >
-              {link}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
+            if (index === 0) position = "first";
+            if (index === allPages.length - 1) position = "last";
+            if (allPages.length === 1) position = "single";
+            if (page === "...") position = "middle";
 
-        {sections.length > 1 && !isLastSection && canSafelyShowFurtherLinks && (
- 
-            <PaginationItem>
-              <Button
-                variant="ghost"
-                size={"icon"}
-                disabled={
-                  sections.indexOf(currentSection) === sections.length - 1
-                }
-                onClick={() => setShowFurtherLinks((prev) => !prev)}
-              >
-                {showFurtherLinks ? (
-                  <>
-                    <ChevronsRightLeft className="size-4" />
-                    <span className="sr-only">Hide further link</span>
-                  </>
-                ) : (
-                  <>
-                    <PaginationEllipsis />
-                    <span className="sr-only">Show further link</span>
-                  </>
-                )}
-              </Button>
-            </PaginationItem>
-       
-        )}
+            return (
+              <PaginationNumber
+                key={page}
+                href={createPageURL(page)}
+                page={page}
+                position={position}
+                isActive={currentPage === page}
+              />
+            );
+          })}
+        </div>
 
-        {showFurtherLinks && canSafelyShowFurtherLinks && (
-          <>
-            {!showFurtherLinks && (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
-            {sections[sections.indexOf(currentSection) + 2]
-              ?.slice(2)
-              ?.map((link) => (
-                <PaginationItem key={link}>
-                  <PaginationLink href={getPageURL(link)}>
-                    {link}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-          </>
-        )}
-        {hasNextPage && (
-          <PaginationItem>
-            <PaginationNext
-              href={getPageURL(page + 1)}
-              className={cn("border-secondary", {
-                "opacity-40 hover:bg-background": !hasNextPage,
-              })}
-            />
-          </PaginationItem>
-        )}
-      </PaginationContent>
-    </PaginationContainer>
+        <PaginationArrow
+          direction="right"
+          href={createPageURL(currentPage + 1)}
+          isDisabled={currentPage >= totalPages}
+        />
+      </div>
+    </>
   );
 }
-export default Pagination;
+
+function PaginationNumber({
+  page,
+  href,
+  isActive,
+  position,
+}: {
+  page: number | string;
+  href: string;
+  position?: "first" | "last" | "middle" | "single";
+  isActive: boolean;
+}) {
+  const className = clsx(
+    "flex h-10 w-10 items-center justify-center text-sm border bg-card text-card-foreground",
+    {
+      "rounded-l-md": position === "first" || position === "single",
+      "rounded-r-md": position === "last" || position === "single",
+      "z-10 bg-primary border-primary text-primary-foreground": isActive,
+      "hover:bg-muted": !isActive && position !== "middle",
+      "text-secondary": position === "middle",
+    }
+  );
+
+  return isActive || position === "middle" ? (
+    <div className={className}>{page}</div>
+  ) : (
+    <Link href={href} className={className}>
+      {page}
+    </Link>
+  );
+}
+
+function PaginationArrow({
+  href,
+  direction,
+  isDisabled,
+}: {
+  href: string;
+  direction: "left" | "right";
+  isDisabled?: boolean;
+}) {
+  const className = clsx(
+    "flex h-10 w-10 items-center justify-center rounded-md border border-border bg-card text-card-foreground",
+    {
+      "pointer-events-none opacity-50": isDisabled,
+      "hover:bg-accent": !isDisabled,
+      "mr-2 md:mr-4": direction === "left",
+      "ml-2 md:ml-4": direction === "right",
+    }
+  );
+
+  const icon =
+    direction === "left" ? (
+      <ArrowLeftIcon className="w-4" />
+    ) : (
+      <ArrowRightIcon className="w-4" />
+    );
+
+  return isDisabled ? (
+    <div className={className}>{icon}</div>
+  ) : (
+    <Link className={className} href={href}>
+      {icon}
+    </Link>
+  );
+}

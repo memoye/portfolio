@@ -1,7 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { SubmitButton } from "./SubmitButton";
-import { cookies } from "next/headers";
+import { SubmitButton } from "../SubmitButton";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 export default async function LoginForm() {
   // const cookieStore = cookies();
@@ -25,7 +26,9 @@ export default async function LoginForm() {
 
     if (error) {
       console.log(error);
-      return redirect("/login?message=Could not authenticate user");
+      return redirect(
+        `/login?message=${error.message || "Could not authenticate."}`
+      );
     }
 
     return redirect("/admin");
@@ -36,26 +39,26 @@ export default async function LoginForm() {
   }
 
   return (
-    <form
-      className="animate-in flex w-full flex-1 flex-col justify-center gap-2 text-foreground"
-      // action={signIn}
-    >
-      <label className="text-md" htmlFor="email">
+    <form className="flex w-full flex-1 flex-col justify-center gap-2 text-foreground">
+      <Label className="text-md" htmlFor="email">
         Email
-      </label>
-      <input
-        className="mb-6 rounded-md border bg-inherit px-4 py-2"
+      </Label>
+      <Input
         name="email"
+        id="email"
+        className="bg-inherit "
         placeholder="you@example.com"
         required
       />
-      <label className="text-md" htmlFor="password">
+      <div className="my-1" />
+      <Label className="text-md" htmlFor="password">
         Password
-      </label>
-      <input
+      </Label>
+      <Input
         className="mb-6 rounded-md border bg-inherit px-4 py-2"
         type="password"
         name="password"
+        id="password"
         placeholder="••••••••"
         required
       />

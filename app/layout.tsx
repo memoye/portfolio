@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={GeistSans.className}>
-      <body className="bg-background text-foreground">
+      <body className="bg-background text-foreground antialiased">
         <div className="min-h-screen">{children}</div>
       </body>
     </html>
